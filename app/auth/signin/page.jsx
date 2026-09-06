@@ -92,7 +92,14 @@ export default function SignInPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 py-12">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center"
+      >
+        <div className="h-[400px] w-[400px] animate-pulse rounded-full bg-primary/20 blur-[120px]" />
+      </div>
+
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Recruitment 2026</CardTitle>
