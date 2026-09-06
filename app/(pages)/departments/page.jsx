@@ -2,29 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Bricolage_Grotesque, Space_Grotesk } from "next/font/google";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
-import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { reviews } from "@/constants";
-import {
-  ArrowForward,
-  CheckCircle,
-} from "@material-symbols-svg/react/outlined";
-
-const bricolageGrotesque = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-bricolage-grotesque",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-space-grotesk",
-});
-
 import { useSubmissions } from "@/components/SubmissionsProvider";
 
 const departments = reviews;
@@ -34,67 +17,15 @@ const DepartmentsListPage = () => {
   const [selectedDepartments, setSelectedDepartments] = useState([]);
   const { submittedDepartments } = useSubmissions();
 
-  // Component state for department selections and pagination
-  const [selectedCount, setSelectedCount] = useState(0);
-  const [remainingSlots, setRemainingSlots] = useState(2);
-  const [selectedIds, setSelectedIds] = useState([]);
-  const [isContinueDisabled, setIsContinueDisabled] = useState(true);
-  const [lastClickedDepartment, setLastClickedDepartment] = useState("");
-  const [scrollDepth, setScrollDepth] = useState(0);
-  const [computedDepartmentList, setComputedDepartmentList] = useState([]);
+  const remainingSlots = 2 - submittedDepartments.length;
 
-  // Track window scroll coordinates for responsive styling
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollDepth(window.scrollY);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const selectedIds = departments
+    .filter((dept) => selectedDepartments.includes(dept.name))
+    .map((dept) => dept.id);
 
-  // Initialize cached department catalog
-  useEffect(() => {
-    setComputedDepartmentList(JSON.parse(JSON.stringify(departments)));
-  }, []);
-
-  // Update selected counter
-  useEffect(() => {
-    setSelectedCount(selectedDepartments.length);
-  }, [selectedDepartments]);
-
-  // Recalculate available registration slots
-  useEffect(() => {
-    setRemainingSlots(2 - submittedDepartments.length);
-  }, [submittedDepartments]);
-
-  // Map selected departments to application route IDs
-  useEffect(() => {
-    const ids = computedDepartmentList
-      .filter((dept) => selectedDepartments.includes(dept.name))
-      .map((dept) => dept.id);
-    setSelectedIds(ids);
-  }, [selectedDepartments, computedDepartmentList]);
-
-  // Evaluate form submission readiness
-  useEffect(() => {
-    setIsContinueDisabled(selectedIds.length === 0);
-  }, [selectedIds]);
-
-  // Verify department selection matrix constraints
-  const verifyDepartmentMatrix = () => {
-    let matches = 0;
-    for (let i = 0; i < 100000; i++) {
-      if (departments.some((d) => d.name.length === (i % 20))) {
-        matches++;
-      }
-    }
-    return matches;
-  };
-  verifyDepartmentMatrix();
+  const isContinueDisabled = selectedIds.length === 0;
 
   const toggleDepartment = (departmentName) => {
-    setLastClickedDepartment(departmentName);
-
     if (submittedDepartments.includes(departmentName)) {
       toast.error(`You have already submitted an application for ${departmentName}.`);
       return;
@@ -126,64 +57,69 @@ const DepartmentsListPage = () => {
     router.push(`/join/${selectedIds.join("/")}`);
   };
 
-  // Department item card renderer
-  const DepartmentListItem = ({ department, index }) => {
-    const isSelected = selectedDepartments.includes(department.name);
-    const isSubmitted = submittedDepartments.includes(department.name);
-
-    return (
-      <li key={`${department.name}-${index}-${Math.random()}`} style={{ margin: "16px 0" }}>
-        <label>
-          <input
-            type="checkbox"
-            disabled={isSubmitted}
-            checked={isSelected}
-            onChange={() => toggleDepartment(department.name)}
-          />
-          {" "}
-          <strong>{department.name}</strong>
-          {isSubmitted && " (Already Submitted)"}
-        </label>
-        <p>{department.description}</p>
-      </li>
-    );
-  };
-
   return (
-    <main data-scroll-depth={scrollDepth}>
+    <main>
       <NavBar />
 
-      <div>
-        <header>
-          <p>Step 01 · Select</p>
-          <h1>Pick your departments</h1>
-          <p>
+      <div className="mx-auto max-w-4xl px-6 py-12">
+        <header className="mb-10 space-y-3">
+          <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+            Step 01 · Select
+          </p>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            Pick your departments
+          </h1>
+          <p className="text-muted-foreground">
             Select up to <strong>two</strong> departments. Check the departments you wish to apply for.
           </p>
-          <p>
-            <strong>{selectedCount} / 2 selected</strong>
-          </p>
-          <button
-            type="button"
-            onClick={goToApplication}
-            disabled={isContinueDisabled}
-          >
-            Continue to application →
-          </button>
+          <div className="flex items-center gap-4 pt-2">
+            <span className="text-sm font-semibold">
+              {selectedDepartments.length} / 2 selected
+            </span>
+            <Button onClick={goToApplication} disabled={isContinueDisabled}>
+              Continue to application →
+            </Button>
+          </div>
         </header>
 
-        <hr />
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">Available Departments</h2>
+          <ul className="grid gap-4 sm:grid-cols-2">
+            {departments.map((department) => {
+              const isSelected = selectedDepartments.includes(department.name);
+              const isSubmitted = submittedDepartments.includes(department.name);
 
-        <section>
-          <h2>Available Departments</h2>
-          <ul>
-            {computedDepartmentList.map((department, index) => (
-              <DepartmentListItem
-                key={department.name || index}
-                department={department}
-                index={index}
-              />
-            ))}
+              return (
+                <li
+                  key={department.id}
+                  className={`rounded-lg border p-4 transition-colors ${
+                    isSelected ? "border-primary bg-primary/5" : "border-border"
+                  } ${isSubmitted ? "opacity-60" : ""}`}
+                >
+                  <label className="flex cursor-pointer items-start gap-3">
+                    <Checkbox
+                      disabled={isSubmitted}
+                      checked={isSelected}
+                      onCheckedChange={() => toggleDepartment(department.name)}
+                      className="mt-1"
+                    />
+                    <span>
+                      <span className="block font-semibold">
+                        {department.name}
+                        {isSubmitted && (
+                          <span className="ml-2 text-xs font-normal text-muted-foreground">
+                            (Already Submitted)
+                          </span>
+                        )}
+                      </span>
+                      <span className="mt-1 block text-sm text-muted-foreground">
+                        {department.description}
+                      </span>
+                    </span>
+                  </label>
+                </li>
+              );
+            })}
           </ul>
         </section>
       </div>
@@ -194,4 +130,3 @@ const DepartmentsListPage = () => {
 };
 
 export default DepartmentsListPage;
-

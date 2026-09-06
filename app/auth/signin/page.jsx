@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bricolage_Grotesque, Space_Grotesk } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,23 +16,11 @@ import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import DWASFWLoader from "@/components/GDGLoader";
 
-const bricolageGrotesque = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-bricolage-grotesque",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-space-grotesk",
-});
-
 export default function SignInPage() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
-  const [mode, setMode] = useState("signin"); // "signin" | "signup"
+  const [mode, setMode] = useState("signin");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,10 +38,8 @@ export default function SignInPage() {
 
   if (session?.user) {
     return (
-      <div className="min-h-screen bg-[#0d0d11] flex items-center justify-center">
-        <div className="text-center text-white">
-          <p className="text-sm text-zinc-400">Redirecting...</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-sm text-muted-foreground">Redirecting...</p>
       </div>
     );
   }
@@ -65,7 +50,6 @@ export default function SignInPage() {
       toast.error("Please fill in all required fields.");
       return;
     }
-
     if (mode === "signup" && !name) {
       toast.error("Please enter your name.");
       return;
@@ -108,78 +92,79 @@ export default function SignInPage() {
   };
 
   return (
-    <main style={{ padding: "20px", maxWidth: "400px", margin: "40px auto" }}>
-      <h1>Recruitment 2026</h1>
-      <p>Candidate Portal</p>
-
-      <div>
-        <button
-          type="button"
-          onClick={() => setMode("signin")}
-          disabled={mode === "signin"}
-        >
-          Sign In
-        </button>
-        {" | "}
-        <button
-          type="button"
-          onClick={() => setMode("signup")}
-          disabled={mode === "signup"}
-        >
-          Create Account
-        </button>
-      </div>
-
-      <hr />
-
-      <h2>{mode === "signin" ? "Sign In" : "Create Account"}</h2>
-
-      <form onSubmit={handleSubmit}>
-        {mode === "signup" && (
-          <div style={{ marginBottom: "12px" }}>
-            <label htmlFor="name">Full Name: </label>
-            <br />
-            <input
-              id="name"
-              type="text"
-              placeholder="Jane Doe"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+    <main className="flex min-h-screen items-center justify-center px-4 py-12">
+      <Card className="w-full max-w-sm">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Recruitment 2026</CardTitle>
+          <CardDescription>Candidate Portal</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-6 grid grid-cols-2 gap-2">
+            <Button
+              type="button"
+              variant={mode === "signin" ? "default" : "outline"}
+              onClick={() => setMode("signin")}
+            >
+              Sign In
+            </Button>
+            <Button
+              type="button"
+              variant={mode === "signup" ? "default" : "outline"}
+              onClick={() => setMode("signup")}
+            >
+              Create Account
+            </Button>
           </div>
-        )}
 
-        <div style={{ marginBottom: "12px" }}>
-          <label htmlFor="email">Email Address: </label>
-          <br />
-          <input
-            id="email"
-            type="email"
-            placeholder="name@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {mode === "signup" && (
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Jane Doe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+            )}
 
-        <div style={{ marginBottom: "12px" }}>
-          <label htmlFor="password">Password: </label>
-          <br />
-          <input
-            id="password"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="name@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-        <button type="submit" disabled={submitting}>
-          {submitting ? "Processing..." : mode === "signin" ? "Sign In" : "Create Account"}
-        </button>
-      </form>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <Button type="submit" className="w-full" disabled={submitting}>
+              {submitting
+                ? "Processing..."
+                : mode === "signin"
+                ? "Sign In"
+                : "Create Account"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </main>
   );
 }
