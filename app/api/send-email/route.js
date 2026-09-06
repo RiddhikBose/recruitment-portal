@@ -1,9 +1,8 @@
-require("dotenv").config();
 import nodemailer from "nodemailer";
 import { reviews } from "@/constants";
 
 const transporter = nodemailer.createTransport({
-    service: "gmail", // or your preferred email service
+    service: "gmail",
     auth: {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD,
@@ -22,23 +21,7 @@ export async function POST(req) {
 
     try {
         for (const recipient of recipients) {
-            let depart = recipient.Department;
-            if (depart === "Video Editing") {
-                depart = "Photography";
-            }
-            const dept = reviews.find((item) => item.name === depart);
-
-            let deptName = dept.name;
-            if (
-                deptName === "Web Development" ||
-                deptName === "App Development"
-            ) {
-                deptName = "Development Department";
-            }
-
-            if (deptName === "Photography" || deptName === "Video Editing") {
-                deptName = "Photography & Video Editing Department";
-            }
+            let deptName = recipient.Department || "your selected department";
 
             let generalTemp = `
                 <div>
@@ -64,8 +47,9 @@ export async function POST(req) {
             { status: 200 }
         );
     } catch (error) {
+        console.error("Email sending error:", error);
         return new Response(
-            JSON.stringify({ error: "Failed to send emails" }),
+            JSON.stringify({ error: error.message || "Failed to send emails" }),
             { status: 500 }
         );
     }
