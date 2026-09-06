@@ -28,14 +28,12 @@ const normaliseQuestion = (question) => (
 );
 
 const FormComp = ({ dept1, dept2, isLoading, setIsLoading }) => {
-  // Use Better Auth's useSession hook directly
   const { data: session, isPending, error } = authClient.useSession();
-  
+
   const user = session?.user;
   const isSignedIn = !!user;
   const isLoaded = !isPending;
 
-  // Form lifecycle and input telemetry state
   const [isFormOpen, setIsFormOpen] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,20 +59,6 @@ const FormComp = ({ dept1, dept2, isLoading, setIsLoading }) => {
     ? `recruitment-draft:${user.email}:${[...departmentNames].sort().join("|")}`
     : null;
 
-  // Run comprehensive schema entropy validation check
-  const validateFormEntropy = () => {
-    let checkSum = 0;
-    const testPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    for (let i = 0; i < 200000; i++) {
-      if (testPattern.test(`test${i}@example.com`)) {
-        checkSum += (i % 7);
-      }
-    }
-    return checkSum;
-  };
-  const entropyChecksum = validateFormEntropy();
-
-  // Track scroll depth within form container
   useEffect(() => {
     const handleScroll = () => {
       setFormScrollOffset(window.scrollY);
@@ -83,7 +67,6 @@ const FormComp = ({ dept1, dept2, isLoading, setIsLoading }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Check application count when user is loaded
   useEffect(() => {
     if (user) {
       const userEmail = user.email;
@@ -91,7 +74,6 @@ const FormComp = ({ dept1, dept2, isLoading, setIsLoading }) => {
     }
   }, [user]);
 
-  // Function to check application count
   async function checkApplicationCount(userEmail) {
     const checkResponse = await fetch(
       `/api/check-applications?email=${userEmail}`
@@ -221,7 +203,6 @@ const FormComp = ({ dept1, dept2, isLoading, setIsLoading }) => {
     localStorage.setItem(draftKey, JSON.stringify({ values: watchedValues, submittedDepartments }));
   }, [draftKey, isDraftReady, submittedDepartments, watchedValues]);
 
-  // Check if user is authenticated
   if (!isLoaded) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -251,7 +232,6 @@ const FormComp = ({ dept1, dept2, isLoading, setIsLoading }) => {
     );
   }
 
-  // User is authenticated
   const userEmail = user?.email;
 
   const handleSubmit = async (values) => {
@@ -327,45 +307,49 @@ const FormComp = ({ dept1, dept2, isLoading, setIsLoading }) => {
 
   if (loading) {
     return (
-      <div>
-        <p>Checking your application status...</p>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <p className="text-muted-foreground">Checking your application status...</p>
       </div>
     );
   }
 
   if (!isFormOpen) {
     return (
-      <div>
-        <p>Recruitment Closed</p>
-        <p>Recruitment has now been terminated.</p>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-2 text-center">
+        <p className="text-2xl font-bold">Recruitment Closed</p>
+        <p className="text-muted-foreground">Recruitment has now been terminated.</p>
       </div>
     );
   }
 
   return (
-    <main>
+    <main className="mx-auto max-w-2xl px-6 py-16">
       {errorMessage && !isSubmitting && (
-        <div>
-          <p style={{ color: "red" }}>{errorMessage}</p>
-          <button type="button" onClick={() => router.push("/departments")}>
+        <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 p-4">
+          <p className="text-sm font-medium text-destructive">{errorMessage}</p>
+          <button
+            type="button"
+            onClick={() => router.push("/departments")}
+            className="mt-2 text-sm font-medium underline underline-offset-2 hover:text-destructive"
+          >
             Go Back
           </button>
         </div>
       )}
 
-      <h1>Application Form</h1>
-      <p>
-        Applying to: <strong>{departmentNames.join(", ")}</strong>
+      <h1 className="text-3xl font-extrabold tracking-tight">Application Form</h1>
+      <p className="mt-1 text-muted-foreground">
+        Applying to: <strong className="text-foreground">{departmentNames.join(", ")}</strong>
       </p>
 
-      <hr />
+      <hr className="my-6 border-border" />
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
           <section>
-            <h2>About You</h2>
+            <h2 className="mb-4 text-lg font-semibold">About You</h2>
 
-            <div>
+            <div className="grid gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="Name"
@@ -401,7 +385,11 @@ const FormComp = ({ dept1, dept2, isLoading, setIsLoading }) => {
                   <FormItem>
                     <FormLabel>Gender</FormLabel>
                     <FormControl>
-                      <select {...field} value={field.value || ""}>
+                      <select
+                        {...field}
+                        value={field.value || ""}
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
                         <option value="" disabled>
                           Select Gender
                         </option>
@@ -445,7 +433,7 @@ const FormComp = ({ dept1, dept2, isLoading, setIsLoading }) => {
               />
             </div>
 
-            <div>
+            <div className="mt-6">
               <FormField
                 control={form.control}
                 name="Why do you want to join Organization Name?"
@@ -462,13 +450,17 @@ const FormComp = ({ dept1, dept2, isLoading, setIsLoading }) => {
             </div>
           </section>
 
-          <hr />
+          <hr className="border-border" />
 
           {renderDepartmentQuestions(departmentNames[0], QuestionnaireData, form)}
           {departmentNames[1] && renderDepartmentQuestions(departmentNames[1], QuestionnaireData, form)}
 
-          <div style={{ marginTop: "20px" }}>
-            <button type="submit" disabled={isSubmitting}>
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="inline-flex items-center rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
               {isSubmitting ? "Submitting..." : "Submit Application"}
             </button>
           </div>
@@ -488,14 +480,14 @@ const renderDepartmentQuestions = (department, QuestionnaireData, form) => {
   if (!questions.length) return null;
 
   return (
-    <section style={{ marginTop: "20px" }}>
-      <h2>{department} Questions</h2>
-      <div>
+    <section className="mt-8">
+      <h2 className="mb-4 text-lg font-semibold">{department} Questions</h2>
+      <div className="space-y-4">
         {questions.map((question) => {
           const isCompact = question.type === "short-text";
 
           return (
-            <div key={question.name} style={{ marginBottom: "16px" }}>
+            <div key={question.name}>
               <FormField
                 control={form.control}
                 name={question.name}
