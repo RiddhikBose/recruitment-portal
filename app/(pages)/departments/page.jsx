@@ -6,6 +6,7 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { MagicCard } from "@/components/magicui/magic-card";
 import { toast } from "sonner";
 import { reviews } from "@/constants";
 import { useSubmissions } from "@/components/SubmissionsProvider";
@@ -90,33 +91,34 @@ const DepartmentsListPage = () => {
               const isSubmitted = submittedDepartments.includes(department.name);
 
               return (
-                <li
-                  key={department.id}
-                  className={`rounded-lg border p-4 transition-colors ${
-                    isSelected ? "border-primary bg-primary/5" : "border-border"
-                  } ${isSubmitted ? "opacity-60" : ""}`}
-                >
-                  <label className="flex cursor-pointer items-start gap-3">
-                    <Checkbox
-                      disabled={isSubmitted}
-                      checked={isSelected}
-                      onCheckedChange={() => toggleDepartment(department.name)}
-                      className="mt-1"
-                    />
-                    <span>
-                      <span className="block font-semibold">
-                        {department.name}
-                        {isSubmitted && (
-                          <span className="ml-2 text-xs font-normal text-muted-foreground">
-                            (Already Submitted)
-                          </span>
-                        )}
+                <li key={department.id} className={isSubmitted ? "opacity-60" : ""}>
+                  <MagicCard
+                    gradientColor={isSelected ? "#8ab4f8" : "#404040"}
+                    gradientOpacity={0.5}
+                    className={`w-full ${isSelected ? "border-primary" : ""}`}
+                  >
+                    <label className="flex w-full cursor-pointer items-start gap-3 p-4">
+                      <Checkbox
+                        disabled={isSubmitted}
+                        checked={isSelected}
+                        onCheckedChange={() => toggleDepartment(department.name)}
+                        className="mt-1"
+                      />
+                      <span>
+                        <span className="block font-semibold">
+                          {department.name}
+                          {isSubmitted && (
+                            <span className="ml-2 text-xs font-normal text-muted-foreground">
+                              (Already Submitted)
+                            </span>
+                          )}
+                        </span>
+                        <span className="mt-1 block text-sm text-muted-foreground">
+                          {department.description}
+                        </span>
                       </span>
-                      <span className="mt-1 block text-sm text-muted-foreground">
-                        {department.description}
-                      </span>
-                    </span>
-                  </label>
+                    </label>
+                  </MagicCard>
                 </li>
               );
             })}

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import UserButton from "./UserButton";
 import { authClient } from "@/lib/auth-client";
 
@@ -24,7 +25,12 @@ const NavBar = () => {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur">
+    <motion.header
+      initial={{ opacity: 0, y: -16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur"
+    >
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <div className="flex items-baseline gap-3">
           <Link href="/" className="text-lg font-bold tracking-tight">
@@ -39,7 +45,7 @@ const NavBar = () => {
             <Link
               key={item.href}
               href={item.href}
-              className="text-muted-foreground transition-colors hover:text-foreground"
+              className="relative text-muted-foreground transition-colors hover:text-foreground after:absolute after:-bottom-1 after:left-0 after:h-[1.5px] after:w-0 after:bg-foreground after:transition-all after:duration-300 hover:after:w-full"
             >
               {item.label}
             </Link>
@@ -58,7 +64,7 @@ const NavBar = () => {
           )}
         </div>
       </nav>
-    </header>
+    </motion.header>
   );
 };
 

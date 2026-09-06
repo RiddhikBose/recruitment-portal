@@ -3,26 +3,55 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 export default function Hero() {
   return (
     <section className="mx-auto flex max-w-4xl flex-col items-center gap-6 px-6 py-24 text-center sm:py-32">
-      <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl">
+      <motion.h1
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="bg-gradient-to-r from-primary via-foreground to-primary bg-[length:200%_auto] bg-clip-text text-4xl font-extrabold tracking-tight text-transparent sm:text-6xl"
+      >
         Recruitment 2026
-      </h1>
-      <h2 className="text-xl font-medium text-muted-foreground sm:text-2xl">
+      </motion.h1>
+
+      <motion.h2
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+        className="text-xl font-medium text-muted-foreground sm:text-2xl"
+      >
         Ready to make your mark?
-      </h2>
-      <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
+      </motion.h2>
+
+      <motion.p
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+        className="max-w-2xl text-base text-muted-foreground sm:text-lg"
+      >
         Join our departments and work on real-world projects. Your journey starts here.
-      </p>
-      <Button asChild size="lg" className="mt-4 gap-2">
-        <Link href="/departments">
-          Join us
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      </Button>
+      </motion.p>
+
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+      >
+        <Button
+          asChild
+          size="lg"
+          className="group mt-4 gap-2 transition-transform hover:scale-105"
+        >
+          <Link href="/departments">
+            Join us
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </Button>
+      </motion.div>
     </section>
   );
 }
