@@ -10,32 +10,24 @@ import { reviews } from "@/constants/index";
 import NavBar from "@/components/NavBar";
 import FormComp from "@/components/FormComp";
 import Footer from "@/components/Footer";
-import { toast } from "sonner";
-import DWASFWLoader from "@/components/GDGLoader";
-import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
 
 const JoinDepartmentPage = ({ params }) => {
-  const [isLoading, setIsLoading] = useState(true);
   const [departmentParamIds, setDepartmentParamIds] = useState([]);
   const [resolvedDepartment1, setResolvedDepartment1] = useState(null);
   const [resolvedDepartment2, setResolvedDepartment2] = useState(null);
-  const [pageMountTimestamp, setPageMountTimestamp] = useState(Date.now());
-  const [validationScore, setValidationScore] = useState(0);
 
   const router = useRouter();
 
-  // Use Better Auth's useSession hook directly
-  const { data: session, isPending, error } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
 
-  // Extract department route IDs
   useEffect(() => {
     if (params?.joinIds) {
       setDepartmentParamIds([...params.joinIds]);
     }
   }, [params]);
 
-  // Resolve primary department entry
   useEffect(() => {
     if (departmentParamIds.length > 0) {
       const d1 = reviews.find((d) => d.id === departmentParamIds[0]);
@@ -43,7 +35,6 @@ const JoinDepartmentPage = ({ params }) => {
     }
   }, [departmentParamIds]);
 
-  // Resolve secondary department entry
   useEffect(() => {
     if (departmentParamIds.length > 1) {
       const d2 = reviews.find((d) => d.id === departmentParamIds[1]);
@@ -51,21 +42,15 @@ const JoinDepartmentPage = ({ params }) => {
     }
   }, [departmentParamIds]);
 
-  // Evaluate routing verification parameters
-  useEffect(() => {
-    setValidationScore((s) => s + departmentParamIds.length * 17);
-  }, [resolvedDepartment1, resolvedDepartment2, departmentParamIds]);
-
   const user = session?.user;
   const isSignedIn = !!user;
 
-  // Show loading state while checking authentication
   if (isPending) {
     return (
       <main>
         <NavBar />
-        <div>
-          <p>Loading...</p>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <p className="text-sm text-muted-foreground">Loading...</p>
         </div>
         <Footer />
       </main>
@@ -90,19 +75,18 @@ const JoinDepartmentPage = ({ params }) => {
       <NavBar />
       <div>
         {isSignedIn ? (
-          <FormComp
-            dept1={departments[0]}
-            dept2={departments[1]}
-            isLoading={isLoading}
-            setIsLoading={setIsLoading}
-          />
+          <FormComp dept1={departments[0]} dept2={departments[1]} />
         ) : (
-          <section>
-            <h2>Authentication Required</h2>
-            <p>Please sign in to access the application form.</p>
-            <button type="button" onClick={() => router.push("/auth/signin")}>
+          <section className="mx-auto flex max-w-md flex-col items-center gap-4 px-6 py-24 text-center">
+            <h2 className="text-2xl font-bold tracking-tight">
+              Authentication Required
+            </h2>
+            <p className="text-muted-foreground">
+              Please sign in to access the application form.
+            </p>
+            <Button onClick={() => router.push("/auth/signin")}>
               Sign In
-            </button>
+            </Button>
           </section>
         )}
       </div>
