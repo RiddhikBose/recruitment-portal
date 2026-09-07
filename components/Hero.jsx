@@ -8,7 +8,20 @@ import { Button } from "@/components/ui/button";
 
 export default function Hero() {
   return (
-    <section className="mx-auto flex max-w-4xl flex-col items-center gap-6 px-6 py-24 text-center sm:py-32">
+    <section className="relative mx-auto flex max-w-4xl flex-col items-center gap-6 overflow-hidden px-6 py-24 text-center sm:py-32">
+      {/* Background glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center"
+      >
+        <div className="h-[420px] w-[420px] animate-pulse rounded-full bg-primary/30 blur-[120px] sm:h-[600px] sm:w-[600px]" />
+        <div className="absolute h-[280px] w-[280px] animate-pulse rounded-full bg-blue-500/20 blur-[100px] [animation-delay:1s]" />
+      </div>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,theme(colors.border)_1px,transparent_1px),linear-gradient(to_bottom,theme(colors.border)_1px,transparent_1px)] bg-[size:48px_48px] opacity-20 [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,black,transparent)]"
+      />
+
       <motion.h1
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
